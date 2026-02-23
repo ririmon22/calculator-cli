@@ -22,13 +22,13 @@ fn main() {
         }
     };
 
-    let numbers: Result<Vec<i32>, _> =
-        parts.iter().map(|s| s.parse::<i32>()).collect();
+    let numbers: Result<Vec<f64>, _> =
+        parts.iter().map(|s| s.trim().parse::<f64>()).collect();
 
     let numbers = match numbers {
         Ok(nums) => nums,
         Err(e) => {
-            println!("整数に変換できません:{}",e);
+            println!("数に変換できません:{}",e);
             return;
         }
     };
@@ -39,7 +39,13 @@ fn main() {
         '+' => n1+n2,
         '-' => n1-n2,
         '*' => n1*n2,
-        '/' => n1/n2,
+        '/' => {
+            if n2 == 0.0 {
+                println!("0で割ることはできません。");
+                return;
+            }
+            n1/n2
+        }
         _ => unreachable!(),
     };
 

@@ -1,36 +1,39 @@
-use std::io::stdin;
 fn main() {
-    //TODO: 入力を受け付ける
     use std::io;
 
     let mut input = String::new();
-    let operator;
-    let parts: Vec<&str>;
     io::stdin().read_line(&mut input).expect("入力に失敗しました");
     let input = input.trim();
-    if input.contains('+') {
-        operator='+';
-        parts = input.split('+').collect();
-    }else if input.contains('-') {
-        operator='-';
-        parts = input.split('-').collect();
-    }else if input.contains('*') {
-        operator='*';
-        parts = input.split('*').collect();
-    }else if input.contains('/') {
-        operator='/';
-        parts = input.split('/').collect();
-    }else {
-        println!("対応していない演算子です。");
-        return;
+    let mut found = None;
+    
+    for op in ['+', '-', '*', '/'] {
+        let parts: Vec<&str> = input.split(op).collect();
+        if parts.len() == 2 {
+            found = Some((op, parts));
+            break;
+        }
     }
     
-    if parts.len() != 2 {
-        println!("2項演算のみに対応しています。");
-        return;
-    }
-    let n1 = parts[0].parse::<i32>().unwrap();
-    let n2 = parts[1].parse::<i32>().unwrap();
+    let (operator, parts) = match found {
+        Some(v) => v,
+        None => {
+            println!("2項演算のみ対応しています。");
+            return;
+        }
+    };
+
+    let numbers: Result<Vec<i32>, _> =
+        parts.iter().map(|s| s.parse::<i32>()).collect();
+
+    let numbers = match numbers {
+        Ok(nums) => nums,
+        Err(e) => {
+            println!("整数に変換できません:{}",e);
+            return;
+        }
+    };
+    let n1 = numbers[0];
+    let n2 = numbers[1];
     
     let result = match operator {
         '+' => n1+n2,

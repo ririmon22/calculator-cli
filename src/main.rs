@@ -1,3 +1,11 @@
+#[derive(Debug)]
+enum Operator {
+    Add,
+    Sub,
+    Mul,
+    Div
+}
+
 fn main(){
     if let Err(e) = run() {
         eprintln!("{}", e);
@@ -50,11 +58,16 @@ fn read_input() -> Result<String, String> {
 /// # Returns
 /// Ok((operator, parts)) - 演算子と分割された2つの文字列
 /// Err(String)           - 演算子が見つからない、または2項演算でない場合
-fn find_operator(input: &str) -> Result<(char, Vec<&str>), String> {
-    for op in ['+', '-', '*', '/'] {
-        let parts: Vec<&str> = input.split(op).collect();
+fn find_operator(input: &str) -> Result<(Operator, Vec<&str>), String> {
+    for (op_char, op_enum) in [
+        ('+', Operator::Add),
+        ('-', Operator::Sub),
+        ('*', Operator::Mul),
+        ('/', Operator::Div),
+    ] {
+        let parts: Vec<&str> = input.split(op_char).collect();
         if parts.len() >= 2 {
-            return Ok((op, parts));
+            return Ok((op_enum, parts));
         }
     }
 
@@ -100,18 +113,17 @@ fn parse_numbers(parts: Vec<&str>) -> Result<(f64, f64), String> {
 /// Result<f64, String>
 /// 現在は2項演算のみ対応している。
 /// 複数演算子や優先順位は未対応。
-fn calculate(n1: f64, op: char, n2: f64) -> Result<f64, String> {
+fn calculate(n1: f64, op: Operator, n2: f64) -> Result<f64, String> {
     match op {
-        '+' => Ok(n1 + n2),
-        '-' => Ok(n1 - n2),
-        '*' => Ok(n1 * n2),
-        '/' => {
+        Operator::Add => Ok(n1 + n2),
+        Operator::Sub => Ok(n1 - n2),
+        Operator::Mul => Ok(n1 * n2),
+        Operator::Div => {
             if n2 == 0.0 {
                 Err("0で割ることはできません".to_string())
             } else {
                 Ok(n1 / n2)
             }
         }
-        _ => Err("未対応の演算子です".to_string()),
     }
 }
